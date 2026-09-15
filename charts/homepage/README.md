@@ -212,4 +212,3 @@ To enable the app entry builder, deploy the chart with the above configuration.
 | tolerations | list | `[]` | Tolerations for the pods |
 | volumeMounts | list | `[]` | Additional volumeMounts on the output Deployment definition. |
 | volumes | list | `[]` | Additional volumes on the output Deployment definition. |
-
