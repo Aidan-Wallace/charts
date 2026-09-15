@@ -1,0 +1,29 @@
+version: 2
+updates:
+  - package-ecosystem: "helm"
+    directory: "/charts"
+    schedule:
+      interval: "monthly"
+    groups:
+      helm-charts:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "chore(helm)"
+    labels:
+      - "dependencies"
+      - "helm"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "chore(ci)"
+    labels:
+      - "dependencies"
+      - "github-actions"
