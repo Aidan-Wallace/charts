@@ -42,3 +42,32 @@ jobs:
       - name: Run chart-testing (install+upgrade)
         if: steps.list-changed.outputs.changed == 'true'
         run: ct install --upgrade --target-branch ${{ github.base_ref }}
+
+  validate-helm-schema:
+    name: Validate values.schema.json is up to date
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Generate values schema json
+        uses: losisin/helm-values-schema-json-action@v3
+        with:
+          values: values.yaml
+          useHelmDocs: true
+          fail-on-diff: true
+          working-directory: charts/homepage
+
+  helm-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Run helm-docs
+        uses: losisin/helm-docs-github-action@v2
+        with:
+          chart-search-root: charts/homepage
+          fail-on-diff: true
