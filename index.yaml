@@ -1,0 +1,17 @@
+apiVersion: v1
+entries:
+  homepage:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2026-09-15T20:47:55.54255335Z"
+    description: A Helm chart for the Homepage application
+    digest: 9f90fe94cbc1db4e51c583a2fb612ffaada17d899ccbedb9b8a3a7c483511a02
+    maintainers:
+    - email: aidanwallacedev@gmail.com
+      name: aidan-wallace
+    name: homepage
+    type: application
+    urls:
+    - https://github.com/Aidan-Wallace/charts/releases/download/homepage-0.3.0/homepage-0.3.0.tgz
+    version: 0.3.0
+generated: "2026-09-15T20:47:55.542662732Z"
