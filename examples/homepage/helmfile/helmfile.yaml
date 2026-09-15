@@ -1,0 +1,19 @@
+releases:
+  - name: homepage
+    namespace: homepage-test
+    createNamespace: true
+    chart: ../../../charts/homepage
+    values:
+      - ingress:
+          enabled: true
+          className: ""
+          annotations: {}
+          hosts:
+            - host: homepage.local
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+
+        config:
+          appEntryBuilder:
+            enabled: true

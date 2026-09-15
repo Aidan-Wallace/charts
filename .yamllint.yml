@@ -1,0 +1,12 @@
+---
+extends: default
+
+ignore: |
+  **/templates
+  .github
+
+rules:
+  line-length: disable
+  document-start: disable
+  comments-indentation: disable
+  comments: disable

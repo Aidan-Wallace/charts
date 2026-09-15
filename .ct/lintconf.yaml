@@ -1,0 +1,7 @@
+---
+lint-conf: .yamllint.yml
+
+remote: origin
+target-branch: main
+
+helm-extra-args: --timeout 600s

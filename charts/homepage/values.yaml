@@ -1,0 +1,376 @@
+# yaml-language-server: $schema=values.schema.json
+
+# Default values for homepage.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# @schema minimum: 0
+# -- This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/
+replicaCount: 1
+
+# -- This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+image:
+  # -- Container image repository.
+  repository: ghcr.io/gethomepage/homepage
+  # @schema enum: [Always, IfNotPresent, Never]
+  # -- This sets the pull policy for images.
+  pullPolicy: IfNotPresent
+  # -- Overrides the image tag whose default is the chart appVersion.
+  tag: "v1.4.0"
+
+# @schema item: object
+# -- This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+# -- This is to override the chart name.
+nameOverride: ""
+# -- This is to override the full chart name.
+fullnameOverride: ""
+
+# -- This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: true
+  # -- Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+  # -- Configuration for creating a ClusterRoleBinding. This is required by the app builder container
+  clusterRoleBinding:
+    # -- Specifies whether a ClusterRoleBinding should be created.
+    create: true
+    # -- ClusterRole to bind to the service account.
+    roleName: "cluster-admin"
+
+# @schema additionalProperties: {type: string}
+# -- This is for setting Kubernetes Annotations to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
+podAnnotations: {}
+# @schema additionalProperties: {type: string}
+# -- This is for setting Kubernetes Labels to a Pod.
+# For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+podLabels: {}
+
+# -- Security context for the pod.
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# -- Security context for the pod.
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# -- This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/
+service:
+  # @schema enum: [ClusterIP, NodePort, LoadBalancer, ExternalName]
+  # -- This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  type: ClusterIP
+  # @schema minimum: 1
+  # -- This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
+  port: 3000
+
+# -- This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
+ingress:
+  # -- Enable ingress for the chart.
+  enabled: false
+  # -- Ingress class name.
+  className: ""
+  # -- Annotations to add to the ingress.
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  # -- Hosts and paths served by the ingress.
+  hosts:
+    - # -- Hostname served by the ingress.
+      host: chart-example.local
+      # -- URL paths served for this host.
+      paths:
+        - # -- URL path served by the ingress.
+          path: /
+          # @schema enum: [ImplementationSpecific, Exact, Prefix]
+          # -- Path matching behavior.
+          pathType: ImplementationSpecific
+  # @schema item: object
+  # -- TLS configuration for the ingress.
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+  # -- Optional ingress authentication configuration.
+  auth:
+    # -- Enables authentication for the ingress. Currently, only traefik is supported.
+    # To enable auth, ingress.className must be set to traefik.
+    enabled: false
+    # -- Authentication type. Currently, only basicAuth is supported.
+    # Traefik middleware for auth documentation: https://doc.traefik.io/traefik/reference/routing-configuration/http/middlewares/basicauth/
+    # Generate a secret for basic auth using the following command: kubectl create secret generic homepage-basic-auth --from-literal=users="$(htpasswd -nbB <username> <password>)"
+    type: basicAuth # @schema enum: [basicAuth]
+    basicAuth:
+      # -- Secret containing the basic authentication credentials.
+      secretName: homepage-basic-auth
+
+# -- Resource requests and limits for the main container.
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# -- This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+livenessProbe:
+  # -- HTTP probe configuration.
+  httpGet:
+    # -- HTTP path used by the liveness probe.
+    path: /
+    # -- Named port used by the liveness probe.
+    port: http
+# -- Readiness probe configuration.
+readinessProbe:
+  # -- HTTP probe configuration.
+  httpGet:
+    # -- HTTP path used by the readiness probe.
+    path: /
+    # -- Named port used by the readiness probe.
+    port: http
+
+# @schema item: object
+# -- Additional volumes on the output Deployment definition.
+volumes: []
+  # - name: foo
+  #   secret:
+  #     secretName: mysecret
+  #     optional: false
+
+# @schema item: object
+# -- Additional volumeMounts on the output Deployment definition.
+volumeMounts: []
+  # - name: foo
+  #   mountPath: "/etc/foo"
+  #   readOnly: true
+
+# @schema additionalProperties: {type: string}
+# -- node selector for the pods
+nodeSelector: {}
+
+# @schema item: object
+# -- Tolerations for the pods
+tolerations: []
+
+# -- Affinity for the pods
+affinity: {}
+
+# -- Homepage application configuration.
+config:
+  # -- Specifies the allowed domains that can access the Homepage application.
+  # More information can be found here: https://github.com/gethomepage/homepage/blob/dev/docs/installation/index.md#homepage_allowed_hosts
+  allowedHosts: "example.local"
+
+  # -- Configuration provider for the homepage application. Can be either configMap or s3.
+  provider: configMap # @schema enum: [configMap, s3]
+
+  # -- Fetch data from an S3 bucket that the homepage will use.
+  s3:
+    # -- Create a secret to store aws-secrets. This can be disabled to allow the user to create the secrets
+    createSecret: true
+    # -- Name of the secret containing AWS credentials.
+    secretName: aws-secrets
+    # -- AWS access key ID.
+    accessKeyId: ""
+    # -- AWS secret access key.
+    secretAccessKey: ""
+    # -- AWS region containing the bucket.
+    region: ""
+    # -- Path within the S3 bucket.
+    s3Path: ""
+
+    # -- This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+    image:
+      # -- Container image repository.
+      repository: amazon/aws-cli
+      # @schema enum: [Always, IfNotPresent, Never]
+      # -- This sets the pull policy for images.
+      pullPolicy: IfNotPresent
+      # -- Overrides the image tag whose default is the chart appVersion.
+      tag: "2.27.50"
+
+    # -- Resource requests and limits for the S3 container.
+    resources: {}
+      # We usually recommend not to specify default resources and to leave this as a conscious
+      # choice for the user. This also increases chances charts run on environments with little
+      # resources, such as Minikube. If you do want to specify resources, uncomment the following
+      # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+      # limits:
+      #   cpu: 100m
+      #   memory: 128Mi
+      # requests:
+      #   cpu: 100m
+      #   memory: 128Mi
+
+  # -- Homepage configuration files stored in a ConfigMap.
+  configMap:
+    # -- Homepage bookmarks configuration
+    # @default -- The example configuration provided below will be used.
+    bookmarks.yaml: |
+      ---
+      # For configuration options and examples, please see:
+      # https://gethomepage.dev/configs/bookmarks
+
+      - Developer:
+          - Github:
+              - abbr: GH
+                href: https://github.com/
+
+      - Social:
+          - Reddit:
+              - abbr: RE
+                href: https://reddit.com/
+
+      - Entertainment:
+          - YouTube:
+              - abbr: YT
+                href: https://youtube.com/
+
+    # -- Homepage custom CSS configuration
+    # @default -- The example configuration provided below will be used.
+    custom.css: |
+      /* Use this section to add custom CSS to your homepage */
+
+    # -- Homepage custom JS configuration
+    # @default -- The example configuration provided below will be used.
+    custom.js: |
+      // Use this section to add custom JS to your homepage
+
+    # -- Homepage Docker configuration
+    # @default -- The example configuration provided below will be used.
+    docker.yaml: |
+      ---
+      # For configuration options and examples, please see:
+      # https://gethomepage.dev/configs/docker/
+
+      # my-docker:
+      #   host: 127.0.0.1
+      #   port: 2375
+
+      # my-docker:
+      #   socket: /var/run/docker.sock
+
+    # -- Homepage Kubernetes configuration
+    # @default -- The example configuration provided below will be used.
+    kubernetes.yaml: |
+      ---
+      # sample kubernetes config
+
+    # -- Homepage Proxmox configuration
+    # @default -- The example configuration provided below will be used.
+    proxmox.yaml: |
+      ---
+      # pve:
+      #   url: https://proxmox.host.or.ip:8006
+      #   token: username@pam!Token ID
+      #   secret: secret
+
+    # -- Homepage Services configuration
+    # @default -- The example configuration provided below will be used.
+    services.yaml: |
+      ---
+      # For configuration options and examples, please see:
+      # https://gethomepage.dev/configs/services/
+
+      - My First Group:
+          - My First Service:
+              href: http://localhost/
+              description: Homepage is awesome
+
+      - My Second Group:
+          - My Second Service:
+              href: http://localhost/
+              description: Homepage is the best
+
+      - My Third Group:
+          - My Third Service:
+              href: http://localhost/
+              description: Homepage is 😎
+
+    # -- Homepage Settings configuration
+    # @default -- The example configuration provided below will be used.
+    settings.yaml: |
+      ---
+      # For configuration options and examples, please see:
+      # https://gethomepage.dev/configs/settings/
+
+      providers:
+        openweathermap: openweathermapapikey
+        weatherapi: weatherapiapikey
+
+    # -- Homepage Widgets configuration
+    # @default -- The example configuration provided below will be used.
+    widgets.yaml: |
+      ---
+      # For configuration options and examples, please see:
+      # https://gethomepage.dev/configs/info-widgets/
+
+      - resources:
+          cpu: true
+          memory: true
+          disk: /
+
+      - search:
+          provider: duckduckgo
+          target: _blank
+
+  # @schema additionalProperties: {type: string}
+  # -- Add extra files to the homepage configuration folder.
+  # Note that these files will be merged with the default
+  # configuration files and will override any existing configuration.
+  extraFiles: []
+    # my-dashboard.yaml: |
+    #   foo: bar
+
+# -- a sidecar container that will automatically build app entries for Homepage based off Kubernetes resources.
+# url to the homepage app.
+appEntryBuilder:
+  # -- Enable the app entry builder sidecar.
+  enabled: false
+
+  # -- Time to sleep between loop iterations
+  sleepIterationSeconds: 30
+
+  # @schema enum: [Trace, Debug, Information, Warning, Error, Critical]
+  # -- Log Level. [Trace, Debug, Information, Warning, Error, Critical]
+  logLevel: "Information"
+
+  # -- This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/
+  image:
+    # -- Container image repository.
+    repository: ghcr.io/aidan-wallace/homepage-extensions/homepage-annotations
+    # -- This sets the pull policy for images.
+    pullPolicy: IfNotPresent
+    # -- Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+
+  # -- Resource requests and limits for the app entry builder sidecar.
+  resources: {}
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+    #   cpu: 100m
+    #   memory: 128Mi

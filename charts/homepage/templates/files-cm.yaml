@@ -1,0 +1,23 @@
+{{- if or (eq .Values.config.provider "configMap") (gt (len .Values.config.extraFiles) 0) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "homepage.filesConfigMapName" . }}
+  labels:
+    {{- include "homepage.labels" . | nindent 4 }}
+data:
+{{- $files := dict -}}
+{{- if eq .Values.config.provider "configMap" }}
+{{- range $name, $content := .Values.config.configMap }}
+{{- $_ := set $files $name $content }}
+{{- end }}
+{{- end }}
+{{- range $name, $content := .Values.config.extraFiles }}
+{{- $_ := set $files $name $content }}
+{{- end }}
+data:
+{{- range $name, $content := $files }}
+  {{ $name }}: |
+{{ $content | nindent 4 }}
+{{- end }}
+{{- end }}
