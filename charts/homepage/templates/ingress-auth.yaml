@@ -1,0 +1,19 @@
+{{- if .Values.ingress.auth.enabled }}
+{{- if eq .Values.ingress.className "traefik" }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ include "homepage.ingressAuthMiddlewareName" . }}
+  labels:
+    {{- include "homepage.labels" . | nindent 4 }}
+spec:
+{{- if eq .Values.ingress.auth.type "basicAuth" }}
+  basicAuth:
+    secret: {{ .Values.ingress.auth.basicAuth.secretName | quote }}
+{{- else }}
+{{- fail (printf "Unsupported ingress.auth.type %q" .Values.ingress.auth.type) }}
+{{- end }}
+{{- else }}
+{{- fail (printf "Unsupported ingress.className for auth %q" .Values.ingress.className) }}
+{{- end }}
+{{- end }}

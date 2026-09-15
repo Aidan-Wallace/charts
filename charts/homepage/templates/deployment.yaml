@@ -1,0 +1,178 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "homepage.fullname" . }}
+  labels:
+    {{- include "homepage.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "homepage.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "homepage.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "homepage.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        {{- if eq .Values.config.provider "s3" }}
+        - name: {{ include "homepage.s3Name" . }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.config.s3.image.repository }}:{{ .Values.config.s3.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.config.s3.image.pullPolicy }}
+          env:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: AWS_SECRET_ACCESS_KEY
+            - name: AWS_REGION
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: AWS_REGION
+            - name: S3_PATH
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secrets
+                  key: AWS_S3_PATH
+          # TODO: Dynamically set dir based on volumeMounts
+          command: ["sh", "-c", "aws s3 cp ${S3_PATH} /app/config --recursive"]
+          volumeMounts:
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+            - name: config
+              mountPath: /app/config
+          {{- with .Values.config.s3.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+        {{- else if eq .Values.config.provider "configMap" }}
+      initContainers:
+        - name: copy-config
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              cp -a /config-src/. /app/config/
+          volumeMounts:
+            - name: config-src
+              mountPath: /config-src
+              readOnly: true
+            - name: config
+              mountPath: /app/config
+        {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+            - name: config
+              mountPath: /app/config
+          env:
+            - name: HOMEPAGE_ALLOWED_HOSTS
+              value: {{ .Values.config.allowedHosts }}
+        {{- if .Values.appEntryBuilder.enabled }}
+        - name: {{ include "homepage.appBuilder" . }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.appEntryBuilder.image.repository }}:{{ .Values.appEntryBuilder.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.appEntryBuilder.image.pullPolicy }}
+          {{- with .Values.appEntryBuilder.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          {{- with .Values.volumeMounts }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+            - name: config
+              mountPath: /app/config
+          env:
+            - name: SleepIntervalSecs
+              value: {{ .Values.appEntryBuilder.sleepIntervalSecs | default "60" | quote }}
+            - name: ServicesFilepath
+              # TODO: Dynamically set dir based on volumeMounts
+              value: "/app/config/services.yaml"
+            - name: Serilog__MinimumLevel__Default
+              value: {{ .Values.appEntryBuilder.logLevel | default "Information" | quote }}
+        {{- end }}
+      volumes:
+      {{- with .Values.volumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if eq .Values.config.provider "configMap" }}
+        - name: config-src
+          configMap:
+            name: {{ include "homepage.filesConfigMapName" . }}
+        - name: config
+          emptyDir: {}
+      {{- else if eq .Values.config.provider "s3" }}
+        - name: config
+          emptyDir: {}
+      {{- else }}
+      {{- fail (printf "Unsupported config.provider %q" .Values.config.provider) }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
