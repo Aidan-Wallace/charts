@@ -51,7 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - name: run helm-values-schema-json
+      - name: Run helm-values-schema-json
         uses: losisin/helm-values-schema-json-action@v3
         with:
           values: values.yaml
