@@ -45,7 +45,6 @@ jobs:
         run: ct install --upgrade --target-branch ${{ github.base_ref }}
 
   validate-helm-docs:
-    name: Validate values.schema.json is up to date
     runs-on: ubuntu-latest
     permissions:
       contents: read
