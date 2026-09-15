@@ -13,8 +13,8 @@ Helm charts for the [Homepage](https://github.com/gethomepage/homepage) applicat
 Add the Helm repository and install the chart:
 
 ```sh
-helm repo add homepage https://aidan-wallace.github.io/homepage-kubernetes/
-helm upgrade -i homepage homepage/homepage
+helm repo add aidan-wallace https://aidan-wallace.github.io/charts
+helm upgrade -i homepage aidan-wallace/homepage
 ```
 
 ### Port Forwarding
