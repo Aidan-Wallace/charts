@@ -3,119 +3,175 @@
     "type": "object",
     "properties": {
         "affinity": {
+            "description": "Affinity for the pods",
             "type": "object"
         },
         "appEntryBuilder": {
+            "description": "a sidecar container that will automatically build app entries for Homepage based off Kubernetes resources. url to the homepage app.",
             "type": "object",
             "properties": {
                 "enabled": {
+                    "description": "Enable the app entry builder sidecar.",
                     "type": "boolean"
                 },
                 "image": {
+                    "description": "This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/",
                     "type": "object",
                     "properties": {
                         "pullPolicy": {
+                            "description": "This sets the pull policy for images.",
                             "type": "string"
                         },
                         "repository": {
+                            "description": "Container image repository.",
                             "type": "string"
                         },
                         "tag": {
+                            "description": "Overrides the image tag whose default is the chart appVersion.",
                             "type": "string"
                         }
                     }
                 },
                 "logLevel": {
-                    "type": "string"
+                    "description": "Log Level. [Trace, Debug, Information, Warning, Error, Critical]",
+                    "type": "string",
+                    "enum": [
+                        "Trace",
+                        "Debug",
+                        "Information",
+                        "Warning",
+                        "Error",
+                        "Critical"
+                    ]
                 },
                 "resources": {
+                    "description": "Resource requests and limits for the app entry builder sidecar.",
                     "type": "object"
                 },
                 "sleepIterationSeconds": {
+                    "description": "Time to sleep between loop iterations",
                     "type": "integer"
                 }
             }
         },
         "config": {
+            "description": "Homepage application configuration.",
             "type": "object",
             "properties": {
                 "allowedHosts": {
+                    "description": "Specifies the allowed domains that can access the Homepage application. More information can be found here: https://github.com/gethomepage/homepage/blob/dev/docs/installation/index.md#homepage_allowed_hosts",
                     "type": "string"
                 },
                 "configMap": {
+                    "description": "Homepage configuration files stored in a ConfigMap.",
                     "type": "object",
                     "properties": {
                         "bookmarks.yaml": {
+                            "description": "Homepage bookmarks configuration",
                             "type": "string"
                         },
                         "custom.css": {
+                            "description": "Homepage custom CSS configuration",
                             "type": "string"
                         },
                         "custom.js": {
+                            "description": "Homepage custom JS configuration",
                             "type": "string"
                         },
                         "docker.yaml": {
+                            "description": "Homepage Docker configuration",
                             "type": "string"
                         },
                         "kubernetes.yaml": {
+                            "description": "Homepage Kubernetes configuration",
                             "type": "string"
                         },
                         "proxmox.yaml": {
+                            "description": "Homepage Proxmox configuration",
                             "type": "string"
                         },
                         "services.yaml": {
+                            "description": "Homepage Services configuration",
                             "type": "string"
                         },
                         "settings.yaml": {
+                            "description": "Homepage Settings configuration",
                             "type": "string"
                         },
                         "widgets.yaml": {
+                            "description": "Homepage Widgets configuration",
                             "type": "string"
                         }
                     }
                 },
                 "extraFiles": {
-                    "type": "array"
+                    "description": "Add extra files to the homepage configuration folder. Note that these files will be merged with the default configuration files and will override any existing configuration.",
+                    "type": "array",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
                 },
                 "provider": {
-                    "type": "string"
+                    "description": "Configuration provider for the homepage application. Can be either configMap or s3.",
+                    "type": "string",
+                    "enum": [
+                        "configMap",
+                        "s3"
+                    ]
                 },
                 "s3": {
+                    "description": "Fetch data from an S3 bucket that the homepage will use.",
                     "type": "object",
                     "properties": {
                         "accessKeyId": {
+                            "description": "AWS access key ID.",
                             "type": "string"
                         },
                         "createSecret": {
+                            "description": "Create a secret to store aws-secrets. This can be disabled to allow the user to create the secrets",
                             "type": "boolean"
                         },
                         "image": {
+                            "description": "This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/",
                             "type": "object",
                             "properties": {
                                 "pullPolicy": {
-                                    "type": "string"
+                                    "description": "This sets the pull policy for images.",
+                                    "type": "string",
+                                    "enum": [
+                                        "Always",
+                                        "IfNotPresent",
+                                        "Never"
+                                    ]
                                 },
                                 "repository": {
+                                    "description": "Container image repository.",
                                     "type": "string"
                                 },
                                 "tag": {
+                                    "description": "Overrides the image tag whose default is the chart appVersion.",
                                     "type": "string"
                                 }
                             }
                         },
                         "region": {
+                            "description": "AWS region containing the bucket.",
                             "type": "string"
                         },
                         "resources": {
+                            "description": "Resource requests and limits for the S3 container.",
                             "type": "object"
                         },
                         "s3Path": {
+                            "description": "Path within the S3 bucket.",
                             "type": "string"
                         },
                         "secretAccessKey": {
+                            "description": "AWS secret access key.",
                             "type": "string"
                         },
                         "secretName": {
+                            "description": "Name of the secret containing AWS credentials.",
                             "type": "string"
                         }
                     }
@@ -123,74 +179,109 @@
             }
         },
         "fullnameOverride": {
+            "description": "This is to override the full chart name.",
             "type": "string"
         },
         "image": {
+            "description": "This sets the container image more information can be found here: https://kubernetes.io/docs/concepts/containers/images/",
             "type": "object",
             "properties": {
                 "pullPolicy": {
-                    "type": "string"
+                    "description": "This sets the pull policy for images.",
+                    "type": "string",
+                    "enum": [
+                        "Always",
+                        "IfNotPresent",
+                        "Never"
+                    ]
                 },
                 "repository": {
+                    "description": "Container image repository.",
                     "type": "string"
                 },
                 "tag": {
+                    "description": "Overrides the image tag whose default is the chart appVersion.",
                     "type": "string"
                 }
             }
         },
         "imagePullSecrets": {
-            "type": "array"
+            "description": "This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/",
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
         },
         "ingress": {
+            "description": "This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/",
             "type": "object",
             "properties": {
                 "annotations": {
+                    "description": "Annotations to add to the ingress.",
                     "type": "object"
                 },
                 "auth": {
+                    "description": "Optional ingress authentication configuration.",
                     "type": "object",
                     "properties": {
                         "basicAuth": {
                             "type": "object",
                             "properties": {
                                 "secretName": {
+                                    "description": "Secret containing the basic authentication credentials.",
                                     "type": "string"
                                 }
                             }
                         },
                         "enabled": {
+                            "description": "Enables authentication for the ingress. Currently, only traefik is supported. To enable auth, ingress.className must be set to traefik.",
                             "type": "boolean"
                         },
                         "type": {
-                            "type": "string"
+                            "description": "Authentication type. Currently, only basicAuth is supported. Traefik middleware for auth documentation: https://doc.traefik.io/traefik/reference/routing-configuration/http/middlewares/basicauth/",
+                            "type": "string",
+                            "enum": [
+                                "basicAuth"
+                            ]
                         }
                     }
                 },
                 "className": {
+                    "description": "Ingress class name.",
                     "type": "string"
                 },
                 "enabled": {
+                    "description": "Enable ingress for the chart.",
                     "type": "boolean"
                 },
                 "hosts": {
+                    "description": "Hosts and paths served by the ingress.",
                     "type": "array",
                     "items": {
                         "type": "object",
                         "properties": {
                             "host": {
+                                "description": "Hostname served by the ingress.",
                                 "type": "string"
                             },
                             "paths": {
+                                "description": "URL paths served for this host.",
                                 "type": "array",
                                 "items": {
                                     "type": "object",
                                     "properties": {
                                         "path": {
+                                            "description": "URL path served by the ingress.",
                                             "type": "string"
                                         },
                                         "pathType": {
-                                            "type": "string"
+                                            "description": "Path matching behavior.",
+                                            "type": "string",
+                                            "enum": [
+                                                "ImplementationSpecific",
+                                                "Exact",
+                                                "Prefix"
+                                            ]
                                         }
                                     }
                                 }
@@ -199,20 +290,28 @@
                     }
                 },
                 "tls": {
-                    "type": "array"
+                    "description": "TLS configuration for the ingress.",
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
                 }
             }
         },
         "livenessProbe": {
+            "description": "This is to setup the liveness and readiness probes more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/",
             "type": "object",
             "properties": {
                 "httpGet": {
+                    "description": "HTTP probe configuration.",
                     "type": "object",
                     "properties": {
                         "path": {
+                            "description": "HTTP path used by the liveness probe.",
                             "type": "string"
                         },
                         "port": {
+                            "description": "Named port used by the liveness probe.",
                             "type": "string"
                         }
                     }
@@ -220,30 +319,48 @@
             }
         },
         "nameOverride": {
+            "description": "This is to override the chart name.",
             "type": "string"
         },
         "nodeSelector": {
-            "type": "object"
+            "description": "node selector for the pods",
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
         },
         "podAnnotations": {
-            "type": "object"
+            "description": "This is for setting Kubernetes Annotations to a Pod. For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/",
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
         },
         "podLabels": {
-            "type": "object"
+            "description": "This is for setting Kubernetes Labels to a Pod. For more information checkout: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/",
+            "type": "object",
+            "additionalProperties": {
+                "type": "string"
+            }
         },
         "podSecurityContext": {
+            "description": "Security context for the pod.",
             "type": "object"
         },
         "readinessProbe": {
+            "description": "Readiness probe configuration.",
             "type": "object",
             "properties": {
                 "httpGet": {
+                    "description": "HTTP probe configuration.",
                     "type": "object",
                     "properties": {
                         "path": {
+                            "description": "HTTP path used by the readiness probe.",
                             "type": "string"
                         },
                         "port": {
+                            "description": "Named port used by the readiness probe.",
                             "type": "string"
                         }
                     }
@@ -251,61 +368,95 @@
             }
         },
         "replicaCount": {
-            "type": "integer"
+            "description": "This will set the replicaset count more information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/replicaset/",
+            "type": "integer",
+            "minimum": 0
         },
         "resources": {
+            "description": "Resource requests and limits for the main container.",
             "type": "object"
         },
         "securityContext": {
+            "description": "Security context for the pod.",
             "type": "object"
         },
         "service": {
+            "description": "This is for setting up a service more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/",
             "type": "object",
             "properties": {
                 "port": {
-                    "type": "integer"
+                    "description": "This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports",
+                    "type": "integer",
+                    "minimum": 1
                 },
                 "type": {
-                    "type": "string"
+                    "description": "This sets the service type more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types",
+                    "type": "string",
+                    "enum": [
+                        "ClusterIP",
+                        "NodePort",
+                        "LoadBalancer",
+                        "ExternalName"
+                    ]
                 }
             }
         },
         "serviceAccount": {
+            "description": "This section builds out the service account more information can be found here: https://kubernetes.io/docs/concepts/security/service-accounts/",
             "type": "object",
             "properties": {
                 "annotations": {
+                    "description": "Annotations to add to the service account",
                     "type": "object"
                 },
                 "automount": {
+                    "description": "Automatically mount a ServiceAccount's API credentials?",
                     "type": "boolean"
                 },
                 "clusterRoleBinding": {
+                    "description": "Configuration for creating a ClusterRoleBinding. This is required by the app builder container",
                     "type": "object",
                     "properties": {
                         "create": {
+                            "description": "Specifies whether a ClusterRoleBinding should be created.",
                             "type": "boolean"
                         },
                         "roleName": {
+                            "description": "ClusterRole to bind to the service account.",
                             "type": "string"
                         }
                     }
                 },
                 "create": {
+                    "description": "Specifies whether a service account should be created",
                     "type": "boolean"
                 },
                 "name": {
+                    "description": "The name of the service account to use. If not set and create is true, a name is generated using the fullname template",
                     "type": "string"
                 }
             }
         },
         "tolerations": {
-            "type": "array"
+            "description": "Tolerations for the pods",
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
         },
         "volumeMounts": {
-            "type": "array"
+            "description": "Additional volumeMounts on the output Deployment definition.",
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
         },
         "volumes": {
-            "type": "array"
+            "description": "Additional volumes on the output Deployment definition.",
+            "type": "array",
+            "items": {
+                "type": "object"
+            }
         }
     }
 }
