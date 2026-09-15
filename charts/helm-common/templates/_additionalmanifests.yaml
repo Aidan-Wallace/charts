@@ -1,0 +1,6 @@
+{{- define "helm-common.additionalManifests" -}}
+{{- range .Values.additionalManifests }}
+---
+{{ tpl (toYaml .) $ }}
+{{- end }}
+{{- end -}}

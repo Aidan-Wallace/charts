@@ -2,6 +2,7 @@
 
 TMP_DIR := tmp
 CHART_DIRS := $(wildcard charts/*/)
+CHART_CI_VALUES = ./values.yaml
 
 .DEFAULT_GOAL := help
 

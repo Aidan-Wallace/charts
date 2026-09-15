@@ -1,0 +1,12 @@
+apiVersion: v2
+name: helm-common
+description: Shared library templates for charts
+type: library
+version: 0.1.0
+appVersion: "1.16.0"
+sources:
+  - https://github.com/aidan-wallace/charts
+maintainers:
+  - name: aidan-wallace
+    email: aidanwallacedev@gmail.com
+home: https://github.com/aidan-wallace/charts/tree/main/charts/helm-common
