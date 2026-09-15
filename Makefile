@@ -10,11 +10,13 @@ help:
 		| sort \
 		| awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
 
+generate: docs schemas
+
 .PHONY: docs
 docs: ## Generate Helm chart documentation
 	for dir in $(CHART_DIRS); do \
 		if [ -f "$$dir/values.yaml" ]; then \
-			(cd "$$dir" && helm-docs --output-file=docs.md); \
+			(cd "$$dir" && helm-docs); \
 		fi \
 	done
 
@@ -22,7 +24,7 @@ docs: ## Generate Helm chart documentation
 schemas:
 	for dir in $(CHART_DIRS); do \
 		if [ -f "$$dir/values.yaml" ]; then \
-			(cd "$$dir" && helm schema --values values.yaml -o values.schema.json); \
+			(cd "$$dir" && helm schema --values values.yaml -o values.schema.json  --use-helm-docs); \
 		fi \
 	done
 
