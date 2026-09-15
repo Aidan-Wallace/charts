@@ -6,11 +6,13 @@ on:
     branches: ["main"]
     paths:
       - "charts/**"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/release.yml"
 
 jobs:
   release:
-    if: github.event_name != 'pull_request'
-
     runs-on: ubuntu-latest
 
     permissions:
@@ -19,21 +21,23 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v4.3.1
+        uses: azure/setup-helm@v5.0.1
         with:
           version: "v3.18.2"
 
       - name: Configure Git
+        if: github.event_name != 'pull_request'
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Create gh-pages branch if it doesn't exist
+        if: github.event_name != 'pull_request'
         run: |
           if ! git ls-remote --heads origin gh-pages | grep -q gh-pages; then
             echo "Creating gh-pages branch..."
@@ -53,15 +57,17 @@ jobs:
         with:
           charts_dir: charts
           skip_existing: true
+          install_only: ${{ github.event_name == 'pull_request' }}
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Push Charts to GHCR
+        if: github.event_name != 'pull_request'
         run: |
           for pkg in .cr-release-packages/*; do
             if [ -z "${pkg:-}" ]; then break; fi
