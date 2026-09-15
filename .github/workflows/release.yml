@@ -7,10 +7,6 @@ on:
     paths:
       - "charts/**"
 
-permissions:
-  contents: write
-  packages: write
-
 jobs:
   release:
     if: github.event_name != 'pull_request'
@@ -19,6 +15,7 @@ jobs:
 
     permissions:
       contents: write
+      packages: write
 
     steps:
       - name: Checkout
