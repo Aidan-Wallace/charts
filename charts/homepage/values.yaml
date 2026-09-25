@@ -205,7 +205,7 @@ config:
       # -- This sets the pull policy for images.
       pullPolicy: IfNotPresent
       # -- Overrides the image tag whose default is the chart appVersion.
-      tag: "2.27.50"
+      tag: "2.37.4"
 
     # -- Resource requests and limits for the S3 container.
     resources: {}
