@@ -73,6 +73,7 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
         {{- else if eq .Values.config.provider "configMap" }}
+      initContainers:
         - name: copy-config
           image: busybox:1.36
           command:
