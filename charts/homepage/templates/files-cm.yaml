@@ -5,7 +5,6 @@ metadata:
   name: {{ include "homepage.filesConfigMapName" . }}
   labels:
     {{- include "homepage.labels" . | nindent 4 }}
-data:
 {{- $files := dict -}}
 {{- if eq .Values.config.provider "configMap" }}
 {{- range $name, $content := .Values.config.configMap }}
